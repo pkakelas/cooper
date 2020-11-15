@@ -15,21 +15,6 @@ import (
 const dbName = "./crawler.db"
 const schemaFile = "./schema.sql"
 
-func insertDocumentFrequency(db *sql.DB, DF DocumentFrequency) {
-	sql := `INSERT INTO document_frequency(term, occurencies) VALUES (?, ?)`
-
-	for term, occurencies := range DF {
-		occJSON, err := json.Marshal(occurencies)
-		statement, err := db.Prepare(sql)
-		checkErr(err)
-
-		_, err = statement.Exec(term, string(occJSON))
-		checkErr(err)
-	}
-
-	fmt.Println("Worked")
-}
-
 func loadState() State {
 	db := openDatabase()
 	defer closeDatabase(db)
@@ -49,6 +34,69 @@ func saveState(state State) {
 	emptyAllTables(db)
 	insertDocuments(db, state.documents)
 	insertDocumentFrequency(db, state.DF)
+}
+
+func createNewDatabase() *sql.DB {
+	deleteDatabase()
+
+	file, err := os.Create(dbName)
+	checkErr(err)
+	file.Close()
+
+	db := openDatabase()
+	migrateDatabase(db)
+
+	return db
+}
+
+func deleteDatabase() {
+	os.Remove(dbName)
+}
+
+func openDatabase() *sql.DB {
+	db, err := sql.Open("sqlite3", dbName)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return db
+}
+
+func closeDatabase(db *sql.DB) {
+	db.Close()
+}
+
+func migrateDatabase(db *sql.DB) {
+	schema, err := ioutil.ReadFile(schemaFile)
+	commands := strings.Split(string(schema), ";")
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	for _, command := range commands {
+		statement, err := db.Prepare(command)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		statement.Exec()
+	}
+	log.Println("[DB] Database was migrated")
+}
+
+func insertDocumentFrequency(db *sql.DB, DF DocumentFrequency) {
+	sql := `INSERT INTO document_frequency(term, occurencies) VALUES (?, ?)`
+
+	for term, occurencies := range DF {
+		occJSON, err := json.Marshal(occurencies)
+		statement, err := db.Prepare(sql)
+		checkErr(err)
+
+		_, err = statement.Exec(term, string(occJSON))
+		checkErr(err)
+	}
+
+	fmt.Println("Worked")
 }
 
 func emptyAllTables(db *sql.DB) {
@@ -126,54 +174,6 @@ func getDocuments(db *sql.DB) (documents []Document) {
 	}
 
 	return
-}
-
-func createNewDatabase() *sql.DB {
-	deleteDatabase()
-
-	file, err := os.Create(dbName)
-	checkErr(err)
-	file.Close()
-
-	db := openDatabase()
-	migrateDatabase(db)
-
-	return db
-}
-
-func deleteDatabase() {
-	os.Remove(dbName)
-}
-
-func openDatabase() *sql.DB {
-	db, err := sql.Open("sqlite3", dbName)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	return db
-}
-
-func closeDatabase(db *sql.DB) {
-	db.Close()
-}
-
-func migrateDatabase(db *sql.DB) {
-	schema, err := ioutil.ReadFile(schemaFile)
-	commands := strings.Split(string(schema), ";")
-
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	for _, command := range commands {
-		statement, err := db.Prepare(command)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		statement.Exec()
-	}
-	log.Println("[DB] Database was migrated")
 }
 
 func checkErr(err error) {
