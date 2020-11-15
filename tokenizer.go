@@ -9,6 +9,7 @@ import (
 	"github.com/kljensen/snowball"
 )
 
+//TODO: Find a stem library which handles non-english words
 func extractStems(document *goquery.Document) (parsed []string) {
 	text := extractText(document)
 	words := strings.Fields(text)
@@ -28,6 +29,7 @@ func extractStems(document *goquery.Document) (parsed []string) {
 	return
 }
 
+//TODO: Convert relative urls to absolute
 func extractLinks(document *goquery.Document) (urls []string) {
 	document.Find("a").Each(func(i int, s *goquery.Selection) {
 		if href, ok := s.Attr("href"); ok {
@@ -38,14 +40,16 @@ func extractLinks(document *goquery.Document) (urls []string) {
 	return
 }
 
-func extractText(document *goquery.Document) (text string) {
-	htmlTags := "h1, h2, h3, h3, h5, h6, p, li, a, td, span"
+//TODO: Fix filtering of scripts when extracting text
+func extractText(document *goquery.Document) string {
+	document.Find("body script").Remove()
+	document.Find("body frame").Remove()
 
-	document.Find(htmlTags).Each(func(i int, s *goquery.Selection) {
-		text += " " + s.Text()
-	})
+	return document.Find("body").Text()
+}
 
-	return
+func extractTitle(document *goquery.Document) string {
+	return document.Find("title").Text()
 }
 
 func trimAllButLetters(r rune) bool {
