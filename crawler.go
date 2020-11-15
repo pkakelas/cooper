@@ -18,18 +18,20 @@ func initCrawler(baseURL string, limit int) {
 
 	for len(URLQueue) > 0 && len(parsed) < limit {
 		url := URLQueue[0]
+		URLQueue = URLQueue[1:]
+
 		document, err := getURLDocument(url)
 		if err != nil {
-			fmt.Println("[Crawler] Url cannot be fetched with error:", url, err)
+			// Uncomment the log below for lots of spamming
+			// fmt.Println("[Crawler] Url cannot be fetched with error:", url, err)
 			continue
 		}
 		neighbors := extractLinks(document)
 
 		parsed = append(parsed, url)
-		URLQueue = URLQueue[1:]
 
-		fmt.Println("[Crawler] Visited urls:", len(parsed))
-		fmt.Println("[Crawler] Queue has urls:", len(URLQueue))
+		fmt.Println("[Crawler] Total visited urls:", len(visited))
+		fmt.Println("[Crawler] Visiting url:", url)
 
 		for _, url := range neighbors {
 			if _, ok := visited[url]; ok {
