@@ -39,7 +39,7 @@ func extractLinks(document *goquery.Document) (urls []string) {
 }
 
 func extractText(document *goquery.Document) (text string) {
-	htmlTags := "h1, h2, h3, h3, h5, h6, p, li, a"
+	htmlTags := "h1, h2, h3, h3, h5, h6, p, li, a, td, span"
 
 	document.Find(htmlTags).Each(func(i int, s *goquery.Selection) {
 		text += " " + s.Text()
