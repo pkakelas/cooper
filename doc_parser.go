@@ -13,6 +13,7 @@ import (
 
 // Document represents a parsed HTML file
 type Document struct {
+	tf        TermFrequency
 	id        string
 	title     string
 	url       string
@@ -21,22 +22,29 @@ type Document struct {
 }
 
 func parseGoQueryDocument(url string, document *goquery.Document) Document {
+	stems := extractStems(document)
+
 	return Document{
 		id:        xid.New().String(),
 		title:     extractTitle(document),
 		neighbors: extractLinks(url, document),
-		stems:     extractStems(document),
+		tf:        generateTermFrequency(stems),
 		url:       url,
+		stems:     stems,
 	}
 }
 
 //TODO: Find a stem library which handles non-english words
-func extractStems(document *goquery.Document) (parsed []string) {
+func extractStems(document *goquery.Document) []string {
 	text := extractText(document)
-	words := strings.Fields(text)
+	terms := strings.Fields(text)
 
-	for _, word := range words {
-		text := strings.TrimFunc(word, trimAllButLetters)
+	return stemize(terms)
+}
+
+func stemize(terms []string) (stems []string) {
+	for _, term := range terms {
+		text := strings.TrimFunc(term, trimAllButLetters)
 
 		stemmed, err := snowball.Stem(text, "english", true)
 		if err != nil || len(stemmed) == 0 {
@@ -45,7 +53,7 @@ func extractStems(document *goquery.Document) (parsed []string) {
 			continue
 		}
 
-		parsed = append(parsed, stemmed)
+		stems = append(stems, stemmed)
 	}
 
 	return

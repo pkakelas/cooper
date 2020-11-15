@@ -9,14 +9,16 @@ import (
 )
 
 // Basic BFS logic
-func initCrawler(baseURL string, limit int) {
+func initCrawler(baseURL string, limit int) (indexed []Document, DF DocumentFrequency) {
+	indexed = []Document{}
+	DF = make(DocumentFrequency)
+
 	visited := make(map[string]bool)
-	parsed := []string{}
 	URLQueue := []string{baseURL}
 
 	fmt.Println("Starting crawler")
 
-	for len(URLQueue) > 0 && len(parsed) < limit {
+	for len(URLQueue) > 0 && len(indexed) < limit {
 		url := URLQueue[0]
 		URLQueue = URLQueue[1:]
 
@@ -28,10 +30,10 @@ func initCrawler(baseURL string, limit int) {
 		}
 
 		document := parseGoQueryDocument(url, goQueryDoc)
-		fmt.Println(document.stems)
-		parsed = append(parsed, url)
+		DF = populateDF(DF, document)
+		indexed = append(indexed, document)
 
-		fmt.Println("[Crawler] Total parsed urls:", len(parsed))
+		fmt.Println("[Crawler] Total parsed urls:", len(indexed))
 		fmt.Println("[Crawler] Visiting url:", url)
 
 		for _, url := range document.neighbors {
@@ -43,6 +45,8 @@ func initCrawler(baseURL string, limit int) {
 			URLQueue = append(URLQueue, url)
 		}
 	}
+
+	return
 }
 
 func getURLDocument(url string) (*goquery.Document, error) {
