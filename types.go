@@ -1,5 +1,11 @@
 package main
 
+// State is a wraper containing all the state vars of the crawler
+type State struct {
+	documents []Document
+	DF        DocumentFrequency
+}
+
 // CrawlerOptions contains all the options given from the CLI
 type CrawlerOptions struct {
 	baseURL  string
