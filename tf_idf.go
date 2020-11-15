@@ -12,9 +12,6 @@ type DocumentFrequency = map[string][]string
 // TermFrequency is the Document Frequency Map
 type TermFrequency = map[string]float64
 
-// TFIDF is the Document Frequency Map
-type TFIDF = map[string][]float64
-
 func generateTermFrequency(stems []string) (TF TermFrequency) {
 	docsize := len(stems)
 	TF = map[string]float64{}

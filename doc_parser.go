@@ -11,16 +11,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Document represents a parsed HTML file
-type Document struct {
-	tf        TermFrequency
-	id        string
-	title     string
-	url       string
-	neighbors []string
-	stems     []string
-}
-
 func parseGoQueryDocument(url string, document *goquery.Document) Document {
 	stems := extractStems(document)
 
