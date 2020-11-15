@@ -8,13 +8,13 @@ import (
 
 func TestTermFrequency(t *testing.T) {
 	testCases := []struct {
-		in  string
+		in  []string
 		out TermFrequency
 	}{
-		{"", TermFrequency{}},
-		{"a", TermFrequency{"a": 1}},
-		{"a b", TermFrequency{"a": 0.5, "b": 0.5}},
-		{"a b b c", TermFrequency{"a": 0.25, "b": 0.5, "c": 0.25}},
+		{[]string{}, TermFrequency{}},
+		{[]string{"a"}, TermFrequency{"a": 1}},
+		{[]string{"a", "b"}, TermFrequency{"a": 0.5, "b": 0.5}},
+		{[]string{"a", "b", "b", "c"}, TermFrequency{"a": 0.25, "b": 0.5, "c": 0.25}},
 	}
 
 	for _, testCase := range testCases {

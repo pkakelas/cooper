@@ -2,7 +2,6 @@ package main
 
 import (
 	"math"
-	"strings"
 )
 
 // DocumentFrequency is the Document Frequency Map
@@ -11,16 +10,15 @@ type DocumentFrequency = map[string][]int
 // TermFrequency is the Document Frequency Map
 type TermFrequency = map[string]float64
 
-func generateTermFrequency(doc string) (TF TermFrequency) {
-	words := strings.Fields(doc)
-	docsize := len(words)
+func generateTermFrequency(stems []string) (TF TermFrequency) {
+	docsize := len(stems)
 	TF = map[string]float64{}
 
-	for _, word := range words {
-		if _, ok := TF[word]; ok {
-			TF[word] += 1 / float64(docsize)
+	for _, stem := range stems {
+		if _, ok := TF[stem]; ok {
+			TF[stem] += 1 / float64(docsize)
 		} else {
-			TF[word] = 1 / float64(docsize)
+			TF[stem] = 1 / float64(docsize)
 		}
 	}
 
