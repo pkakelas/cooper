@@ -2,13 +2,18 @@ package main
 
 import (
 	"math"
+
+	"github.com/gonum/floats"
 )
 
 // DocumentFrequency is the Document Frequency Map
-type DocumentFrequency = map[string][]int
+type DocumentFrequency = map[string][]string
 
 // TermFrequency is the Document Frequency Map
 type TermFrequency = map[string]float64
+
+// TFIDF is the Document Frequency Map
+type TFIDF = map[string][]float64
 
 func generateTermFrequency(stems []string) (TF TermFrequency) {
 	docsize := len(stems)
@@ -25,12 +30,12 @@ func generateTermFrequency(stems []string) (TF TermFrequency) {
 	return TF
 }
 
-func populateDF(DF DocumentFrequency, docID int, TF TermFrequency) DocumentFrequency {
-	for word := range TF {
+func populateDF(DF DocumentFrequency, document Document) DocumentFrequency {
+	for word := range document.tf {
 		if _, ok := DF[word]; ok {
-			DF[word] = append(DF[word], docID)
+			DF[word] = append(DF[word], document.id)
 		} else {
-			DF[word] = []int{docID}
+			DF[word] = []string{document.id}
 		}
 	}
 
@@ -49,6 +54,33 @@ func inversedDocumentFrequency(word string, DF DocumentFrequency, docsCount int)
 	return ret
 }
 
-func generateTfIdfForWord(word string, tf map[string]float64, DF DocumentFrequency, docsCount int) float64 {
-	return tf[word] * inversedDocumentFrequency(word, DF, docsCount)
+func generateTfIdfForWord(term string, termFrequency float64, DF DocumentFrequency, docsCount int) float64 {
+	return termFrequency * inversedDocumentFrequency(term, DF, docsCount)
+}
+
+func calculateTfIdfForDoc(terms []string, TF TermFrequency, DF DocumentFrequency, docsCount int) []float64 {
+	TFIDF := make([]float64, len(terms))
+
+	for idx, term := range terms {
+		TFIDF[idx] = generateTfIdfForWord(term, TF[term], DF, docsCount)
+		idx++
+	}
+
+	return TFIDF
+}
+
+// Vector length Math.sqrt(d[0]^2 + d[1]^2 + ..)
+func vectorLength(v []float64) float64 {
+	length := 0.0
+
+	for _, dim := range v {
+		length += dim * dim
+	}
+
+	return math.Sqrt(length)
+}
+
+// Cosine Similarity (d1, d2) =  Dot product(d1, d2) / ||d1|| * ||d2||
+func cosineSimilarity(d1 []float64, d2 []float64) float64 {
+	return floats.Dot(d1, d2) / (vectorLength(d1) * vectorLength(d1))
 }

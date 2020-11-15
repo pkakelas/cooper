@@ -26,23 +26,30 @@ func TestTermFrequency(t *testing.T) {
 }
 
 func TestPopulateDF(t *testing.T) {
-	TF := TermFrequency{"a": 5, "c": 5}
+	document := Document{
+		id:        "id5",
+		tf:        TermFrequency{"a": 5, "c": 5},
+		title:     "new page",
+		url:       "https://mypage.com",
+		stems:     []string{"a", "b"},
+		neighbors: []string{"https://google.com"},
+	}
 	DF := DocumentFrequency{
-		"a": {1, 2, 3},
-		"b": {1, 2, 4},
+		"a": {"id1", "id2", "id3"},
+		"b": {"id1", "id2", "id4"},
 	}
 
-	got := populateDF(DF, 5, TF)
+	got := populateDF(DF, document)
 
-	if !intInSlice(5, got["a"]) || intInSlice(5, got["b"]) || !intInSlice(5, got["c"]) {
-		t.Errorf("TestPopulateDF failed for testcase:\n(%+v, %d, %+v) => %+v", DF, 5, TF, got)
+	if !stringInSlice("id5", got["a"]) || stringInSlice("id5", got["b"]) || !stringInSlice("id5", got["c"]) {
+		t.Errorf("TestPopulateDF failed for testcase:\n(%+v, %s) => %+v", DF, "id5", got)
 	}
 }
 
 func TestInversedDocumentFrequency(t *testing.T) {
 	DF := DocumentFrequency{
-		"a": {1},
-		"b": {1, 2, 3},
+		"a": {"id1"},
+		"b": {"id1", "id2", "id3"},
 	}
 	got := inversedDocumentFrequency("a", DF, 15)
 
@@ -51,7 +58,7 @@ func TestInversedDocumentFrequency(t *testing.T) {
 	}
 }
 
-func intInSlice(a int, list []int) bool {
+func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
 			return true
