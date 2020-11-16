@@ -6,6 +6,7 @@ CREATE TABLE crawled_document (
     termfreq TEXT NOT NULL,
     UNIQUE(url)
 );
+
 CREATE TABLE document_frequency (
     term INTEGER NOT NULL,
     occurencies TEXT NOT NULL,
