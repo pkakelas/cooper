@@ -15,25 +15,42 @@ import (
 const dbName = "./crawler.db"
 const schemaFile = "./schema.sql"
 
-func loadState() State {
+func loadState() (state State) {
+	fmt.Println("[Database] Loading state")
+	if !fileExists(dbName) {
+		fmt.Println("[Database] There's no storage initialized.")
+		return State{
+			documents: []Document{},
+			DF:        make(DocumentFrequency),
+		}
+	}
+
 	db := openDatabase()
 	defer closeDatabase(db)
+	documents := getDocuments(db)
+	DF := getDocumentFrequency(db)
 
-	return State{
-		documents: getDocuments(db),
-		DF:        getDocumentFrequency(db),
+	state = State{
+		documents: documents,
+		DF:        DF,
 	}
+	fmt.Println("[Database] Loaded", len(state.documents), "documents")
+
+	return
 }
 
 //TODO Update tables instead of flushing all of them and re-inserting everything
 //TODO Implement bulk insertions
 func saveState(state State) {
-	db := openDatabase()
-	defer closeDatabase(db)
+	var db *sql.DB
 
-	emptyAllTables(db)
+	fmt.Println("[Database] Saving state")
+
+	db = createNewDatabase()
 	insertDocuments(db, state.documents)
 	insertDocumentFrequency(db, state.DF)
+
+	fmt.Print("[Database] Saving state completed")
 }
 
 func createNewDatabase() *sql.DB {
@@ -55,9 +72,7 @@ func deleteDatabase() {
 
 func openDatabase() *sql.DB {
 	db, err := sql.Open("sqlite3", dbName)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	checkErr(err)
 
 	return db
 }
@@ -68,11 +83,8 @@ func closeDatabase(db *sql.DB) {
 
 func migrateDatabase(db *sql.DB) {
 	schema, err := ioutil.ReadFile(schemaFile)
+	checkErr(err)
 	commands := strings.Split(string(schema), ";")
-
-	if err != nil {
-		log.Fatal(err.Error())
-	}
 
 	for _, command := range commands {
 		statement, err := db.Prepare(command)
@@ -95,8 +107,6 @@ func insertDocumentFrequency(db *sql.DB, DF DocumentFrequency) {
 		_, err = statement.Exec(term, string(occJSON))
 		checkErr(err)
 	}
-
-	fmt.Println("Worked")
 }
 
 func emptyAllTables(db *sql.DB) {
@@ -104,9 +114,7 @@ func emptyAllTables(db *sql.DB) {
 
 	for _, table := range tablesToEmpty {
 		statement, err := db.Prepare("DELETE FROM " + table)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+		checkErr(err)
 		statement.Exec()
 	}
 }
@@ -180,4 +188,12 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

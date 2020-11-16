@@ -9,16 +9,14 @@ import (
 )
 
 // Basic BFS logic
-func initCrawler(baseURL string, limit int) (indexed []Document, DF DocumentFrequency) {
-	indexed = []Document{}
-	DF = make(DocumentFrequency)
+func initCrawler(opts CrawlerOptions, state State) State {
+	fmt.Println("[Crawler] Starting crawler")
 
-	visited := make(map[string]bool)
-	URLQueue := []string{baseURL}
+	visited := getAlreadyVisitedURLs(state)
+	URLQueue := []string{opts.baseURL}
+	indexedCount := 0
 
-	fmt.Println("Starting crawler")
-
-	for len(URLQueue) > 0 && len(indexed) < limit {
+	for len(URLQueue) > 0 && indexedCount < opts.limit {
 		url := URLQueue[0]
 		URLQueue = URLQueue[1:]
 
@@ -30,10 +28,11 @@ func initCrawler(baseURL string, limit int) (indexed []Document, DF DocumentFreq
 		}
 
 		document := parseGoQueryDocument(url, goQueryDoc)
-		DF = populateDF(DF, document)
-		indexed = append(indexed, document)
+		state.DF = populateDF(state.DF, document)
+		state.documents = append(state.documents, document)
+		indexedCount++
 
-		fmt.Println("[Crawler] Total parsed urls:", len(indexed))
+		fmt.Println("[Crawler] Total parsed urls:", indexedCount)
 		fmt.Println("[Crawler] Visiting url:", url)
 
 		for _, url := range document.neighbors {
@@ -46,7 +45,7 @@ func initCrawler(baseURL string, limit int) (indexed []Document, DF DocumentFreq
 		}
 	}
 
-	return
+	return state
 }
 
 func getURLDocument(url string) (*goquery.Document, error) {
@@ -57,7 +56,7 @@ func getURLDocument(url string) (*goquery.Document, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		log.Fatalf("[CRAWLER] Status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	// Load the HTML document
@@ -67,4 +66,14 @@ func getURLDocument(url string) (*goquery.Document, error) {
 	}
 
 	return doc, nil
+}
+
+func getAlreadyVisitedURLs(state State) map[string]bool {
+	visited := make(map[string]bool)
+
+	for _, document := range state.documents {
+		visited[document.url] = true
+	}
+
+	return visited
 }
