@@ -76,7 +76,9 @@ func extractLinks(url string, document *goquery.Document, includeQueryParams boo
 			}
 
 			href = trimAllButLetters(href)
-			urls = append(urls, href)
+			if isValidURI(href) {
+				urls = append(urls, href)
+			}
 		}
 	})
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"os"
 	"strings"
 	"unicode"
@@ -33,4 +34,12 @@ func fileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func isValidURI(uri string) bool {
+	_, err := url.ParseRequestURI(uri)
+	if err != nil {
+		return false
+	}
+	return true
 }

@@ -24,6 +24,10 @@ func parseFlags() CrawlerOptions {
 		fmt.Println("The base URL should be defined.\nUse --help for more info.")
 		os.Exit(0)
 	}
+	if !isValidURI(*baseURLPtr) {
+		fmt.Println("The base URL is not valid. Please use a url like https://github.com.")
+		os.Exit(0)
+	}
 
 	return CrawlerOptions{
 		baseURL:            *baseURLPtr,
@@ -43,5 +47,6 @@ func getCooper() string {
 	/   #'-.
 	\#|_   _'-. /
 	 |/ \_( # |"
-	C/ ,--___/`
+	C/ ,--___/
+	`
 }
