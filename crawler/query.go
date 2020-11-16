@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-func makeQuery(query string, documents []Document, DF DocumentFrequency) []QueryResult {
+func makeQuery(query string, state State) []QueryResult {
 	terms := strings.Fields(query)
 	stems := stemize(terms)
-	results := calculateSimilarity(stems, documents, DF)
+	results := calculateSimilarity(stems, state)
 
 	sort.SliceStable(results, func(i, j int) bool {
 		return results[i].sim > results[j].sim
@@ -18,16 +18,16 @@ func makeQuery(query string, documents []Document, DF DocumentFrequency) []Query
 	return results
 }
 
-func calculateSimilarity(words []string, documents []Document, DF DocumentFrequency) []QueryResult {
+func calculateSimilarity(words []string, state State) []QueryResult {
 	TF := generateTermFrequency(words)
 	similarities := []QueryResult{}
 
 	// Calculate tf-idf for query
-	queryTFIDF := calculateTfIdfForDoc(words, TF, DF, len(documents))
+	queryTFIDF := calculateTfIdfForDoc(words, TF, state.DF, len(state.documents))
 
 	//Calculate tf-idf for all documents
-	for _, doc := range documents {
-		tfidf := calculateTfIdfForDoc(words, doc.tf, DF, len(documents))
+	for _, doc := range state.documents {
+		tfidf := calculateTfIdfForDoc(words, doc.tf, state.DF, len(state.documents))
 		sim := cosineSimilarity(tfidf, queryTFIDF)
 
 		if math.IsNaN(sim) {
