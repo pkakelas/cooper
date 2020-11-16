@@ -1,8 +1,8 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -58,14 +58,12 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 func getURLDocument(url string) (*goquery.Document, error) {
 	res, err := http.Get(url)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
+	checkErr(err)
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		log.Fatalf("[CRAWLER] Status code error: %d %s", res.StatusCode, res.Status)
+		fmt.Println("[Crawler] Url is broken:", url)
+		return nil, errors.New("Url cannot be fetched")
 	}
 
 	// Load the HTML document
