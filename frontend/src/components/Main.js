@@ -1,14 +1,23 @@
 import logo from '../cooper.png'
-import SearchForm from './SearchForm'
+import Search from './Search'
+import Results from './Results'
 import React, { Component } from 'react';
 
 class Main extends Component {
     constructor(props) {
       super(props);
-      this.state = {value: ''};
-  
+
+      const searchTerm = this.getSearchQueryParam();
+      this.state = searchTerm && searchTerm.length != 0 ?
+        {results: true, query: searchTerm} :
+        {results: false, query: undefined};
+    
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    getSearchQueryParam() {
+      return new URLSearchParams(window.location.search).get("search");
     }
   
     handleChange(event) {
@@ -22,15 +31,20 @@ class Main extends Component {
     }
 
     render() {
+        let mainComponent = this.state.results ?
+            <Results query={this.state.query}></Results> :
+            <Search></Search>
+        let title = this.state.results ?
+            `Search results for query: "${this.state.results}"` :
+            "Welcome to Cooper search"
+            
         return (
-            <div className="App">
-            <header className="App-header">
+            <div class="App">
                 <img src={logo} className="App-logo" alt="logo" />
-                <p> Welcome to the Cooper search! </p>
-                <SearchForm></SearchForm>
-            </header>
+                <h1>{title}</h1>
+                {mainComponent}
             </div>
-        );
+        )
     }
   }
 
