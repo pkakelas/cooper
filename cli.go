@@ -17,6 +17,7 @@ func parseFlags() CrawlerOptions {
 	limitPtr := flag.Int("limit", 50, "The maximum sites that Cooper should visit")
 	loadDataPtr := flag.Bool("load_existed_data", true, "Whether or not the existing crawls should be loaded")
 	threadsPtr := flag.Int("threads", 1, "How many crawl threads Cooper should create")
+	includeQueryParamsPtr := flag.Bool("include_query_params", true, "Should Cooper consider test.com?query and test.com as the same document?")
 	flag.Parse()
 
 	if len(*baseURLPtr) == 0 {
@@ -25,10 +26,11 @@ func parseFlags() CrawlerOptions {
 	}
 
 	return CrawlerOptions{
-		baseURL:  *baseURLPtr,
-		limit:    *limitPtr,
-		loadData: *loadDataPtr,
-		threads:  *threadsPtr,
+		baseURL:            *baseURLPtr,
+		limit:              *limitPtr,
+		threads:            *threadsPtr,
+		loadData:           *loadDataPtr,
+		includeQueryParams: *includeQueryParamsPtr,
 	}
 }
 

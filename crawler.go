@@ -21,6 +21,7 @@ func initCrawler(opts CrawlerOptions, state State) State {
 		fmt.Println("[Crawler] BaseURL is already stored in the database. Consider changing the baseURL.")
 		os.Exit(0)
 	}
+	visited[opts.baseURL] = true
 
 	for len(URLQueue) > 0 && indexedCount < opts.limit {
 		url := URLQueue[0]
@@ -33,7 +34,7 @@ func initCrawler(opts CrawlerOptions, state State) State {
 			continue
 		}
 
-		document := parseGoQueryDocument(url, goQueryDoc)
+		document := parseGoQueryDocument(url, goQueryDoc, opts)
 		state.DF = populateDF(state.DF, document)
 		state.documents = append(state.documents, document)
 		indexedCount++
@@ -43,7 +44,7 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 		for _, url := range document.neighbors {
 			if _, ok := visited[url]; ok {
-				// fmt.Println("[Crawler] URL has been already visited", url)
+				// fmt.Println("[Crawler] URL is already in the visited slice", url)
 				continue
 			}
 
@@ -57,7 +58,10 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 func getURLDocument(url string) (*goquery.Document, error) {
 	res, err := http.Get(url)
-	checkErr(err)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {

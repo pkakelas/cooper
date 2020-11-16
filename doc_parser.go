@@ -10,13 +10,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-func parseGoQueryDocument(url string, document *goquery.Document) Document {
+func parseGoQueryDocument(url string, document *goquery.Document, opts CrawlerOptions) Document {
 	stems := extractStems(document)
 
 	return Document{
 		id:        xid.New().String(),
 		title:     extractTitle(document),
-		neighbors: extractLinks(url, document),
+		neighbors: extractLinks(url, document, opts.includeQueryParams),
 		tf:        generateTermFrequency(stems),
 		url:       url,
 		stems:     stems,
@@ -48,14 +48,34 @@ func stemize(terms []string) (stems []string) {
 	return
 }
 
-func extractLinks(url string, document *goquery.Document) (urls []string) {
+func extractLinks(url string, document *goquery.Document, includeQueryParams bool) (urls []string) {
 	document.Find("a").Each(func(i int, s *goquery.Selection) {
 		if href, ok := s.Attr("href"); ok {
-			if len(href) > 0 && href[1:] == "/" {
-				// Convert relative to absolut path
-				href = extractDomainFromURI(url) + href
+			if len(href) == 0 {
+				return
 			}
 
+			hashtagIdx := strings.Index(href, "#")
+			if hashtagIdx == 0 {
+				// Hash link to part of the page
+				return
+			}
+			if hashtagIdx > 0 {
+				// Remove hash link from the last part of the page
+				href = href[:hashtagIdx]
+			}
+			if string(href[0]) == "/" {
+				// Convert relative to absolute path
+				href = extractDomainFromURI(url) + href
+			}
+			if !includeQueryParams {
+				queryParam := strings.Index(href, "?")
+				if queryParam > 0 {
+					href = href[:queryParam]
+				}
+			}
+
+			href = trimAllButLetters(href)
 			urls = append(urls, href)
 		}
 	})

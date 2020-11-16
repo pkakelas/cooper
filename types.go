@@ -8,10 +8,11 @@ type State struct {
 
 // CrawlerOptions contains all the options given from the CLI
 type CrawlerOptions struct {
-	baseURL  string
-	limit    int
-	loadData bool
-	threads  int
+	baseURL            string
+	limit              int
+	threads            int
+	loadData           bool
+	includeQueryParams bool
 }
 
 // Document represents a parsed HTML file

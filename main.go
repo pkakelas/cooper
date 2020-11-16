@@ -9,8 +9,7 @@ func main() {
 
 func initState(options CrawlerOptions) (state State) {
 	if options.loadData {
-		state = loadState()
-		return
+		return loadState()
 	}
 
 	state = State{
