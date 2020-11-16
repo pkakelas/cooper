@@ -183,17 +183,3 @@ func getDocuments(db *sql.DB) (documents []Document) {
 
 	return
 }
-
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}

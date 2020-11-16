@@ -57,9 +57,7 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 func getURLDocument(url string) (*goquery.Document, error) {
 	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
+	checkErr(err)
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
@@ -83,13 +81,4 @@ func getAlreadyVisitedURLs(state State) map[string]bool {
 	}
 
 	return visited
-}
-
-func existsInSlice(slice []string, val string) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kljensen/snowball"
@@ -34,7 +33,7 @@ func extractStems(document *goquery.Document) []string {
 
 func stemize(terms []string) (stems []string) {
 	for _, term := range terms {
-		text := strings.TrimFunc(term, trimAllButLetters)
+		text := trimAllButLetters(term)
 
 		stemmed, err := snowball.Stem(text, "english", true)
 		if err != nil || len(stemmed) == 0 {
@@ -100,8 +99,4 @@ func extractTitle(document *goquery.Document) string {
 func extractDomainFromURI(url string) string {
 	re := regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)`)
 	return re.FindAllString(url, 1)[0]
-}
-
-func trimAllButLetters(r rune) bool {
-	return !unicode.IsLetter(r)
 }
