@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -15,6 +16,11 @@ func initCrawler(opts CrawlerOptions, state State) State {
 	visited := getAlreadyVisitedURLs(state)
 	URLQueue := []string{opts.baseURL}
 	indexedCount := 0
+
+	if visited[opts.baseURL] {
+		fmt.Println("[Crawler] BaseURL is already stored in the database. Consider changing the baseURL.")
+		os.Exit(0)
+	}
 
 	for len(URLQueue) > 0 && indexedCount < opts.limit {
 		url := URLQueue[0]
@@ -37,6 +43,7 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 		for _, url := range document.neighbors {
 			if _, ok := visited[url]; ok {
+				// fmt.Println("[Crawler] URL has been already visited", url)
 				continue
 			}
 
@@ -76,4 +83,13 @@ func getAlreadyVisitedURLs(state State) map[string]bool {
 	}
 
 	return visited
+}
+
+func existsInSlice(slice []string, val string) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
 }
