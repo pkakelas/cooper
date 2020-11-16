@@ -9,8 +9,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// Basic BFS logic
-func initCrawler(opts CrawlerOptions, state State) State {
+//InitCrawler initializes the basic BFS logic
+func InitCrawler(opts CrawlerOptions, state State) State {
 	fmt.Println("[Crawler] Starting crawler")
 
 	visited := getAlreadyVisitedURLs(state)
@@ -58,12 +58,15 @@ func initCrawler(opts CrawlerOptions, state State) State {
 
 func getURLDocument(url string) (*goquery.Document, error) {
 	res, err := http.Get(url)
-	checkErr(err)
+	if err != nil {
+		fmt.Println("[Crawler] Url cannot be fetched", url)
+		return nil, errors.New("Url cannot be fetched")
+	}
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
 		fmt.Println("[Crawler] Url is broken:", url)
-		return nil, errors.New("Url cannot be fetched")
+		return nil, errors.New("Url returned errored status")
 	}
 
 	// Load the HTML document

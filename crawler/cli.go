@@ -6,7 +6,8 @@ import (
 	"os"
 )
 
-func initCLI() CrawlerOptions {
+//InitCLI handles all the command interface and returns CrawlerOptions
+func InitCLI() CrawlerOptions {
 	fmt.Println("Welcome to Cooper, an simple and lightweight crawler written in Golang!")
 	fmt.Println(getCooper())
 	return parseFlags()

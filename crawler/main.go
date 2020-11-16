@@ -1,15 +1,15 @@
 package main
 
 func main() {
-	options := initCLI()
+	options := InitCLI()
 	state := initState(options)
 	state = initCrawler(options, state)
-	saveState(state)
+	SaveState(state)
 }
 
 func initState(options CrawlerOptions) (state State) {
 	if options.loadData {
-		return loadState()
+		return LoadState()
 	}
 
 	state = State{

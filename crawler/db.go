@@ -15,7 +15,11 @@ import (
 const dbName = "./crawler.db"
 const schemaFile = "./schema.sql"
 
-func loadState() (state State) {
+//TODO Update tables instead of flushing all of them and re-inserting everything
+//TODO Implement bulk insertions
+
+//LoadState loads the DF and all the docs from the database
+func LoadState() (state State) {
 	fmt.Println("[Database] Loading state")
 	if !fileExists(dbName) {
 		fmt.Println("[Database] There's no storage initialized.")
@@ -39,9 +43,8 @@ func loadState() (state State) {
 	return
 }
 
-//TODO Update tables instead of flushing all of them and re-inserting everything
-//TODO Implement bulk insertions
-func saveState(state State) {
+//SaveState saves the DF and all the docs from the database
+func SaveState(state State) {
 	var db *sql.DB
 
 	fmt.Println("[Database] Saving state")
