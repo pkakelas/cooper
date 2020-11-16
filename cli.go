@@ -13,8 +13,8 @@ func initCLI() CrawlerOptions {
 
 func parseFlags() CrawlerOptions {
 	baseURLPtr := flag.String("base_url", "", "The maximum sites that Cooper should visit")
-	maxSitesPtr := flag.Int("max", 50, "The maximum sites that Cooper should visit")
-	keepDataPtr := flag.Bool("keep_data", false, "Whether or not the existing crawls should be kept")
+	limitPtr := flag.Int("limit", 50, "The maximum sites that Cooper should visit")
+	loadDataPtr := flag.Bool("load_existed_data", true, "Whether or not the existing crawls should be loaded")
 	threadsPtr := flag.Int("threads", 1, "How many crawl threads Cooper should create")
 	flag.Parse()
 
@@ -25,8 +25,8 @@ func parseFlags() CrawlerOptions {
 
 	return CrawlerOptions{
 		baseURL:  *baseURLPtr,
-		maxSites: *maxSitesPtr,
-		keepData: *keepDataPtr,
+		limit:    *limitPtr,
+		loadData: *loadDataPtr,
 		threads:  *threadsPtr,
 	}
 }

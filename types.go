@@ -9,8 +9,8 @@ type State struct {
 // CrawlerOptions contains all the options given from the CLI
 type CrawlerOptions struct {
 	baseURL  string
-	maxSites int
-	keepData bool
+	limit    int
+	loadData bool
 	threads  int
 }
 
