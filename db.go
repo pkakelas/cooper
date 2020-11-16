@@ -88,9 +88,7 @@ func migrateDatabase(db *sql.DB) {
 
 	for _, command := range commands {
 		statement, err := db.Prepare(command)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+		checkErr(err)
 		statement.Exec()
 	}
 	log.Println("[DB] Database was migrated")
