@@ -1,10 +1,30 @@
 import React, { Component } from 'react';
-import logo from '../cooper.png'
-import SearchForm from './Search'
+import ResultRow from './ResultRow'
 
 class Search extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {}
+        this.state.a = [
+            {id: "1", title: "your title", url: "https://github.com"},
+            {id: "1", title: "your title", url: "https://github.com"},
+            {id: "1", title: "your title", url: "https://github.com"},
+        ]
+    }
+
+    async componentDidMount() {
+        /*
+        const response = await axios.get("http://localhost:3000", {
+            params: { query: this.props.query }
+        })
+        */
+    }
+
+    createRows(results) {
+        return results.map((r) => {
+            return <ResultRow id={r.id} title={r.title} url={r.url}></ResultRow>
+        })
     }
 
     render() {
@@ -19,21 +39,7 @@ class Search extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Github</td>
-                            <td>https://github.com</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Google</td>
-                            <td>https://google.com</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Twitter</td>
-                            <td>https://twitter.com</td>
-                        </tr>
+                        {this.createRows(this.state.a)}
                     </tbody>
                 </table>
             </div>

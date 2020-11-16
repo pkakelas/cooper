@@ -23,7 +23,7 @@ class Search extends Component {
       return (
         <form className="container-sm" id="search-bar" onSubmit={this.handleSubmit}>
           <div className="form-group">
-            <input type="text" className="form-control" value={this.state.value} onChange={this.handleChange} placeholder="Doggies like cooper.. 🐕 "/>
+            <input type="text" className="form-control" onChange={this.handleChange} placeholder="Doggies like cooper.. 🐕 "/>
           </div>
           <input type="submit" className="btn btn-default" value="Search" />
         </form>

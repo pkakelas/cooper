@@ -8,7 +8,7 @@ class Main extends Component {
       super(props);
 
       const searchTerm = this.getSearchQueryParam();
-      this.state = searchTerm && searchTerm.length != 0 ?
+      this.state = searchTerm && searchTerm.length !== 0 ?
         {results: true, query: searchTerm} :
         {results: false, query: undefined};
     
@@ -39,7 +39,7 @@ class Main extends Component {
             "Welcome to Cooper search"
             
         return (
-            <div class="App">
+            <div className="App">
                 <img src={logo} className="App-logo" alt="logo" />
                 <h1>{title}</h1>
                 {mainComponent}
