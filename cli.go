@@ -7,7 +7,8 @@ import (
 )
 
 func initCLI() CrawlerOptions {
-	fmt.Println("Welcome to Cooper, an simple and lightweight crawler written in Golang!\n ")
+	fmt.Println("Welcome to Cooper, an simple and lightweight crawler written in Golang!")
+	fmt.Println(getCooper())
 	return parseFlags()
 }
 
@@ -29,4 +30,16 @@ func parseFlags() CrawlerOptions {
 		loadData: *loadDataPtr,
 		threads:  *threadsPtr,
 	}
+}
+
+func getCooper() string {
+	return `
+	   _=,_
+	o_/6 /#\
+	\__ |##/
+	='|--\
+	/   #'-.
+	\#|_   _'-. /
+	 |/ \_( # |"
+	C/ ,--___/`
 }
