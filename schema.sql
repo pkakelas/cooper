@@ -3,7 +3,8 @@ CREATE TABLE crawled_document (
     url TEXT NOT NULl,
     title TEXT NOT NULL,
     neighbors TEXT NOT NULL,
-    termfreq TEXT NOT NULL
+    termfreq TEXT NOT NULL,
+    UNIQUE(url)
 );
 
 CREATE TABLE document_frequency (
