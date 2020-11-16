@@ -21,9 +21,9 @@ func TestStateSave(t *testing.T) {
 	}
 
 	createNewDatabase()
-	saveState(state)
+	SaveState(state)
 
-	got := loadState()
+	got := LoadState()
 	gotDoc := got.documents[0]
 	gotDF := got.DF
 	if gotDoc.title != "title" || gotDoc.url != "url" || gotDoc.id != "id" || gotDoc.neighbors[0] != "url2" {
