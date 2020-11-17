@@ -13,6 +13,7 @@ type CrawlerOptions struct {
 	threads            int
 	loadData           bool
 	includeQueryParams bool
+	serverMode         bool
 }
 
 // Document represents a parsed HTML file
@@ -27,8 +28,8 @@ type Document struct {
 
 // QueryResult represents a result-document of the query
 type QueryResult struct {
-	id    string
-	title string
-	url   string
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	URL   string `json:"url"`
 	sim   float64
 }

@@ -3,8 +3,13 @@ package main
 func main() {
 	options := InitCLI()
 	state := initState(options)
-	state = initCrawler(options, state)
-	SaveState(state)
+
+	if options.serverMode {
+		InitServer(state)
+	} else {
+		state = InitCrawler(options, state)
+		SaveState(state)
+	}
 }
 
 func initState(options CrawlerOptions) (state State) {

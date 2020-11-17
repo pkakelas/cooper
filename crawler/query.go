@@ -35,9 +35,9 @@ func calculateSimilarity(words []string, state State) []QueryResult {
 		}
 
 		similarities = append(similarities, QueryResult{
-			id:    doc.id,
-			title: doc.title,
-			url:   doc.url,
+			ID:    doc.id,
+			Title: doc.title,
+			URL:   doc.url,
 			sim:   cosineSimilarity(tfidf, queryTFIDF),
 		})
 	}
