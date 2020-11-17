@@ -1,29 +1,24 @@
+import axios from 'axios'
 import React, { Component } from 'react';
 import ResultRow from './ResultRow'
 
 class Search extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {}
-        this.state.a = [
-            {id: "1", title: "your title", url: "https://github.com"},
-            {id: "1", title: "your title", url: "https://github.com"},
-            {id: "1", title: "your title", url: "https://github.com"},
-        ]
+        this.state = {results: []}
     }
 
     async componentDidMount() {
-        /*
-        const response = await axios.get("http://localhost:3000", {
+        const response = await axios.get("http://localhost:8080", {
             params: { query: this.props.query }
         })
-        */
+
+        this.setState({results: this.createRows(response.data)})
     }
 
     createRows(results) {
-        return results.map((r) => {
-            return <ResultRow id={r.id} title={r.title} url={r.url}></ResultRow>
+        return results.map((r, idx) => {
+            return <ResultRow id={idx + 1} title={r.title} url={r.url}></ResultRow>
         })
     }
 
@@ -39,7 +34,7 @@ class Search extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.createRows(this.state.a)}
+                        {this.state.results}
                     </tbody>
                 </table>
             </div>

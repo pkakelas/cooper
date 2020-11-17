@@ -6,7 +6,7 @@ class ResultRow extends Component {
             <tr>
                 <th scope="row">{this.props.id}</th>
                 <td>{this.props.title}</td>
-                <td>{this.props.url}</td>
+                <td><a href={this.props.url}>{this.props.url}</a></td>
             </tr>
         );
     }
