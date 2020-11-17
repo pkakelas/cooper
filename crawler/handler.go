@@ -6,8 +6,6 @@ import (
 	"net/http"
 )
 
-const resultsLimit = 10
-
 //QueryHandler handler the query get request
 func QueryHandler(state State) func(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(len(state.DF))
@@ -22,7 +20,7 @@ func QueryHandler(state State) func(w http.ResponseWriter, r *http.Request) {
 		//TODO: Sanitize data
 		results := makeQuery(query, state)
 
-		json, err := json.Marshal(results[0:resultsLimit])
+		json, err := json.Marshal(results)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
