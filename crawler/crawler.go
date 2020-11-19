@@ -12,8 +12,8 @@ import (
 
 //InitCrawler initializes the basic BFS logic
 func InitCrawler(opts CrawlerOptions, state State) State {
-	worklist := make(chan []string)  // lists of URLs, may have duplicates
-	unseenLinks := make(chan string) // de-duplicated URLs
+	worklist := make(chan []string)  // All urls found from the goroutines
+	unseenLinks := make(chan string) // Only unseed urls
 	seen := getAlreadyVisitedURLs(state)
 	var wg sync.WaitGroup
 
