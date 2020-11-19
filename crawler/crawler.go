@@ -5,55 +5,73 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 //InitCrawler initializes the basic BFS logic
 func InitCrawler(opts CrawlerOptions, state State) State {
-	fmt.Println("[Crawler] Starting crawler")
+	worklist := make(chan []string)  // lists of URLs, may have duplicates
+	unseenLinks := make(chan string) // de-duplicated URLs
+	seen := getAlreadyVisitedURLs(state)
+	var wg sync.WaitGroup
 
-	visited := getAlreadyVisitedURLs(state)
-	URLQueue := []string{opts.baseURL}
-	indexedCount := 0
-
-	if visited[opts.baseURL] {
+	if seen[opts.baseURL] {
 		fmt.Println("[Crawler] BaseURL is already stored in the database. Consider changing the baseURL.")
 		os.Exit(0)
 	}
-	visited[opts.baseURL] = true
 
-	for len(URLQueue) > 0 && indexedCount < opts.limit {
-		url := URLQueue[0]
-		URLQueue = URLQueue[1:]
+	go func() {
+		worklist <- []string{opts.baseURL}
+	}()
 
-		goQueryDoc, err := getURLDocument(url)
-		if err != nil {
-			// Uncomment the log below for lots of spamming
-			// fmt.Println("[Crawler] Url cannot be fetched with error:", url, err)
-			continue
-		}
+	// Create crawler's goroutines to fetch and parse site
+	for i := 0; i < opts.threads; i++ {
+		go func() {
+			for link := range unseenLinks {
+				wg.Add(1)
+				foundLinks := crawl(link, &state, opts)
+				wg.Done()
 
-		document := parseGoQueryDocument(url, goQueryDoc, opts)
-		state.DF = populateDF(state.DF, document)
-		state.documents = append(state.documents, document)
-		indexedCount++
-
-		fmt.Println("[Crawler] Total parsed urls:", indexedCount)
-		fmt.Println("[Crawler] Visiting url:", url)
-
-		for _, url := range document.neighbors {
-			if _, ok := visited[url]; ok {
-				// fmt.Println("[Crawler] URL is already in the visited slice", url)
-				continue
+				go func() { worklist <- foundLinks }()
 			}
+		}()
+	}
 
-			visited[url] = true
-			URLQueue = append(URLQueue, url)
+	// The main goroutine de-duplicates worklist items
+	// and sends the unseen ones to the crawlers.
+	for list := range worklist {
+		for _, link := range list {
+			if len(seen) == opts.limit {
+				wg.Wait()
+				return state
+			}
+			if !seen[link] {
+				seen[link] = true
+				unseenLinks <- link
+			}
 		}
 	}
 
+	wg.Wait()
 	return state
+}
+
+func crawl(url string, state *State, opts CrawlerOptions) []string {
+	fmt.Println("[Crawler] Crawling", url)
+
+	goQueryDoc, err := getURLDocument(url)
+	if err != nil {
+		fmt.Print("[Crawler] Url cannot be fetched")
+		return []string{}
+	}
+
+	document := parseGoQueryDocument(url, goQueryDoc, opts)
+	(*state).DF = populateDF((*state).DF, document)
+	(*state).documents = append((*state).documents, document)
+
+	return document.neighbors
 }
 
 func getURLDocument(url string) (*goquery.Document, error) {
