@@ -15,7 +15,7 @@ func InitCLI() CrawlerOptions {
 
 func parseFlags() CrawlerOptions {
 	serverModePtr := flag.Bool("server_mode", false, "Work in server mode for serving data to the cooper frontend")
-	baseURLPtr := flag.String("base_url", "", "The maximum sites that Cooper should visit")
+	baseURLPtr := flag.String("base_url", "", "The base url where the crawler should start")
 	limitPtr := flag.Int("limit", 50, "The maximum sites that Cooper should visit")
 	loadDataPtr := flag.Bool("load_existed_data", true, "Whether or not the existing crawls should be loaded")
 	threadsPtr := flag.Int("threads", 1, "How many crawl threads Cooper should create")
