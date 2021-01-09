@@ -9,7 +9,7 @@ import (
 // DocumentFrequency is the Document Frequency Map
 type DocumentFrequency = map[string][]string
 
-// TermFrequency is the Document Frequency Map
+// TermFrequency is the Term Frequency Map
 type TermFrequency = map[string]float64
 
 func generateTermFrequency(stems []string) (TF TermFrequency) {
